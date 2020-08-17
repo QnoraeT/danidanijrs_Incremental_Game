@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+</head>
+  <script src="code/lib/collections.min.js"></script>
+  <script src="code/lib/pixi.min.js"></script>
+  <script src="code/lib/break_eternity.min.js"></script>
+
+<body>
+  <script type="text/javascript">
+    let type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported())
+    {
+      type = "canvas"
+    }
+
+    PIXI.utils.sayHello(type)
+  </script>
+ <script src="code/lib/util.js"></script>
+ <script src="code/ui/button.js"></script>
+ <script src="code/ui/upgradeButton.js"></script>
+ <script src="code/main.js"></script>
+</body>
+</html>
+
+<style>* {padding: 0; margin: 0}</style>
