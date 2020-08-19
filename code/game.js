@@ -120,6 +120,7 @@ function prestige(type)
         ug1.changeText([{text: "Upgrade\nSpeed"}])
         player.ug1.cost = new Decimal(5)
         player.ug1.brought = 0
+        player.ug1.reduction = new Decimal(1)
 
         ug2.changeText([{text: "Decrease\nSpeed Cost"}])
         player.ug2.cost = new Decimal(100000)
