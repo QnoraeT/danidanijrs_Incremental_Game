@@ -166,6 +166,7 @@ function format(x,fixed = false)
 	var lay = x.layer
 	var mag = x.mag
 	if(x.equals(0)) return "0";
+    if(x.lessThan(0)) return "-" + format(x.abs(),fixed);
 	else if(x.lessThan(10))
 	{
 		//var dp = Math.pow(10,((Math.floor(Math.log10(mag)) - 2) * -1))

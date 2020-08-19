@@ -2,7 +2,7 @@ function buyUg1()
 {
     if(player.number.greaterThan(player.ug1.cost.divide(player.ug1.reduction)))
     {
-        player.number = player.number.minus(player.ug1.cost);
+        player.number = player.number.minus(player.ug1.cost.divide(player.ug1.reduction));
         player.ug1.brought++;
         player.stats.totalUg1Brought++
         player.speed = player.speed.multiply(1.5)
