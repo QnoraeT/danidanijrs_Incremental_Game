@@ -1,4 +1,4 @@
-function Button(writing,effect,colour = 0xBBBBBB,borderColour = 0x000000)
+function TabButton(writing,effect,colour,borderColour,selBorderColour,drawAsSelected = false)
 {
     PIXI.Container.call(this);
     
@@ -6,8 +6,10 @@ function Button(writing,effect,colour = 0xBBBBBB,borderColour = 0x000000)
     this.effect = effect
     this.colour = colour
     this.borderColour = borderColour
+    this.selBorderColour = selBorderColour
     
-    this.draw(writing,colour,borderColour)
+    if(drawAsSelected) this.draw(writing,colour,selBorderColour)
+    else this.draw(writing,colour,borderColour)
     
     this.interactive = true;
     var filter = new PIXI.filters.ColorMatrixFilter();
@@ -33,9 +35,9 @@ function Button(writing,effect,colour = 0xBBBBBB,borderColour = 0x000000)
         this.effect()
     })
 }
-Button.prototype = Object.create(PIXI.Container.prototype);
+TabButton.prototype = Object.create(PIXI.Container.prototype);
 
-Button.prototype.draw = function(writing,colour = 0xBBBBBB,borderColour = 0x000000)
+TabButton.prototype.draw = function(writing,colour,borderColour)
 {
     this.removeChildren()
     
