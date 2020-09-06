@@ -5,25 +5,29 @@ Loader.add(["images/on.png","images/off.png"]).load(setup);
 
 function dev()
 {
+    console.info("The dev function has been called")
+    
     unlock("pr2")
     unlock("ug2")
     unlock("ug1autobuyer")
+    unlock("kuaraniai")
     player.pr2.brought = 3
     player.prai = new Decimal(500)
+    player.kuaraniai = new Decimal(0.001)
 }
 
 function setup()
 {   
     //header
-    pointsDisplay = new PIXI.Text("0.000",sansSerifStyle())
+    pointsDisplay = new PIXI.Text("0.000",danidanijrStyle())
     app.stage.addChild(pointsDisplay);
     
-    fpsDisplay = new PIXI.Text("0 FPS",sansSerifStyle(36,"yellow"))
+    fpsDisplay = new PIXI.Text("0 FPS",danidanijrStyle(36,"yellow"))
     fpsDisplay.position.set(480,0)
     fpsDisplay.anchor.set(0.5,0)
     app.stage.addChild(fpsDisplay);
     
-    speedDisplay = new PIXI.Text("Speed: 1",sansSerifStyle())
+    speedDisplay = new PIXI.Text("Speed: 1",danidanijrStyle())
     speedDisplay.position.set(960,0)
     speedDisplay.anchor.set(1,0)
     app.stage.addChild(speedDisplay);
@@ -42,10 +46,10 @@ function setup()
     tabs.stats.position.set(24 + tabContainer.width + 4,60)
     tabContainer.addChild(tabs.stats);
     
-    tabs.kauraniai = new TabButton("Kauraniai",function(){switchTab("kauraniai")},0x2216FF,0xB9B6F9,0xFFB2FC)
-    tabs.kauraniai.position.set(24 + tabContainer.width + 4,60)
-    tabs.kauraniai.visible = false
-    tabContainer.addChild(tabs.kauraniai);
+    tabs.kuaraniai = new TabButton("Kuaraniai",function(){switchTab("kuaraniai")},0x2216FF,0xB9B6F9,0xFFB2FC)
+    tabs.kuaraniai.position.set(24 + tabContainer.width + 4,60)
+    tabs.kuaraniai.visible = false
+    tabContainer.addChild(tabs.kuaraniai);
     
     app.stage.addChild(tabContainer);
     
@@ -57,7 +61,7 @@ function setup()
     ug1.position.set(48,375);
     generatorsTab.addChild(ug1);
     
-    ug1Info = new PIXI.Text("info about upgrade 1",sansSerifStyle(24))
+    ug1Info = new PIXI.Text("info about upgrade 1",danidanijrStyle(24))
     ug1Info.position.set(48,291);
     generatorsTab.addChild(ug1Info);
     
@@ -70,20 +74,20 @@ function setup()
     pr1.position.set(48,500);
     generatorsTab.addChild(pr1)
     
-    praiDisplay = new PIXI.Text("",sansSerifStyle(24))
+    praiDisplay = new PIXI.Text("",danidanijrStyle(24))
     praiDisplay.position.set(48,600);
     generatorsTab.addChild(praiDisplay);
     
-    praiTime = new PIXI.Text("",sansSerifStyle(24))
+    praiTime = new PIXI.Text("",danidanijrStyle(24))
     praiTime.position.set(48,630);
     generatorsTab.addChild(praiTime);
     
-    featureText = new PIXI.Text("",sansSerifStyle(24,"#ff9b96"))
+    featureText = new PIXI.Text("",danidanijrStyle(24,"#ff9b96"))
     featureText.position.set(480,150);
     featureText.anchor.set(0.5,0)
     generatorsTab.addChild(featureText);
     
-    featureProgress = new PIXI.Text("",sansSerifStyle(48,"#ff9b96"))
+    featureProgress = new PIXI.Text("",danidanijrStyle(48,"#ff9b96"))
     featureProgress.position.set(480,178);
     featureProgress.anchor.set(0.5,0)
     generatorsTab.addChild(featureProgress);
@@ -100,7 +104,7 @@ function setup()
     ug2.visible = false
     generatorsTab.addChild(ug2);
     
-    ug2Info = new PIXI.Text("info about upgrade 2",sansSerifStyle(24))
+    ug2Info = new PIXI.Text("info about upgrade 2",danidanijrStyle(24))
     ug2Info.position.set(602,319);
     ug2Info.anchor.set(0,0);
     ug2Info.visible = false
@@ -127,13 +131,61 @@ function setup()
     statsTab.visible = false;
     app.stage.addChild(statsTab)
     
-    statsInfo = new PIXI.Text("stats",sansSerifStyle(24))
+    statsInfo = new PIXI.Text("stats",danidanijrStyle(24))
     statsInfo.position.set(480,180);
     statsInfo.anchor.set(0.5,0);
     statsTab.addChild(statsInfo)
     
-    kauraniaiTab = new Container();
+    //kuaraniai tab
+    kuaraniaiTab = new Container();
+    kuaraniaiTab.visible = false
+    app.stage.addChild(kuaraniaiTab)
     
+    kuaraniaiShardUpgradeButtons = new KuaraniaiUpgradeSection(kuaraniaiShardUpgrades,"KShards")
+    kuaraniaiShardUpgradeButtons.position.set(6,250)
+    kuaraniaiTab.addChild(kuaraniaiShardUpgradeButtons)
+    
+    kuaraniaiShardsDisplay = new PIXI.Text("Kuaraniai Shards: 0",danidanijrStyle(36,"#EC97EF"))
+    kuaraniaiShardsDisplay.position.set(6,185)
+    kuaraniaiTab.addChild(kuaraniaiShardsDisplay);
+    
+    kuaraniaiShardsProdDisplay = new PIXI.Text("0/s",danidanijrStyle());
+    kuaraniaiShardsProdDisplay.position.set(954,185);
+    kuaraniaiShardsProdDisplay.anchor.set(1,0);
+    kuaraniaiTab.addChild(kuaraniaiShardsProdDisplay);
+    
+    kuaraniaiPowerUpgradeButtons = new KuaraniaiUpgradeSection(kuaraniaiPowerUpgrades,"KPower")
+    kuaraniaiPowerUpgradeButtons.position.set(6,500)
+    kuaraniaiTab.addChild(kuaraniaiPowerUpgradeButtons)
+    
+    kuaraniaiPowerDisplay = new PIXI.Text("Kuaraniai Power: 0",danidanijrStyle(36,"#EC97EF"))
+    kuaraniaiPowerDisplay.position.set(6,435)
+    kuaraniaiTab.addChild(kuaraniaiPowerDisplay);
+    
+    kuaraniaiPowerProdDisplay = new PIXI.Text("0/s",danidanijrStyle());
+    kuaraniaiPowerProdDisplay.position.set(954,435);
+    kuaraniaiPowerProdDisplay.anchor.set(1,0);
+    kuaraniaiTab.addChild(kuaraniaiPowerProdDisplay);
+    
+    kuaraniaiDisplay = new PIXI.Text("Kuaraniai: 0",danidanijrStyle(36,"#EC97EF"))
+    kuaraniaiDisplay.position.set(6,100)
+    kuaraniaiTab.addChild(kuaraniaiDisplay);
+    
+    kuaraniaiInfo = new PIXI.Text("Your Kuaraniai makes your points reduce UP1 scaled strength to 100%.",danidanijrStyle(18,"#EC97EF"))
+    kuaraniaiInfo.position.set(6,142)
+    kuaraniaiTab.addChild(kuaraniaiInfo);
+    
+    praiSacrificeInfo = new PIXI.Text("You need to have more than 1 PRai to sacrifice.",danidanijrStyle(24,"#EC97EF"))
+    praiSacrificeInfo.position.set(954,100)
+    praiSacrificeInfo.anchor.set(1,0);
+    kuaraniaiTab.addChild(praiSacrificeInfo);
+    
+    praiSacrificeButton = new Button("Do a PRai sacrifice",function(){prestige("praiSac")},0x101EBA,0x5F6CFC);
+    praiSacrificeButton.position.set(514,110)
+    praiSacrificeButton.visible = false;
+    kuaraniaiTab.addChild(praiSacrificeButton)
+    
+    dev();
     tab = "generators"
     app.ticker.add(delta => gameLoop(delta));
 }
@@ -144,14 +196,20 @@ function gameLoop(delta)
 {
     pointsDisplay.text = format(player.number,true);
     fpsDisplay.text = Math.round(app.ticker.FPS) + " FPS"
-    speedDisplay.text = "Speed: " + format(player.speed.times(calcPRaiBoost()));
+    speedDisplay.text = "Speed: " + format(calcProduction("number"));
     
-    player.number = player.number.add((player.speed.times(calcPRaiBoost())).divide(new Decimal(app.ticker.FPS)))
-    player.stats.totalNumber = player.stats.totalNumber.add((player.speed.times(calcPRaiBoost())).divide(new Decimal(app.ticker.FPS)))
+    player.number = player.number.add(calcProduction("number").divide(new Decimal(app.ticker.FPS)))
+    player.stats.totalNumber = player.stats.totalNumber.add(calcProduction("number").divide(app.ticker.FPS))
     if(player.unlocked.has("ug1autobuyer") && player.ug1.autobuyer) buyUg1();
+    
+    //kuaraniai numbers
+    player.kuaraniaiShards = player.kuaraniaiShards.add(calcProduction("KShards").divide(app.ticker.FPS));
+    player.kuaraniaiPower = player.kuaraniaiPower.add(calcProduction("KPower").divide(app.ticker.FPS));
+    
     if(tab == "generators") generators(delta)
     else if(tab == "options") options(delta)
     else if (tab == "stats") stats(delta)
+    else if (tab == "kuaraniai") kuaraniai(delta)
 }
 
 function generators(delta)
@@ -186,14 +244,14 @@ function generators(delta)
         featureText.text = "Reach 10 PRai to unlock PR2"
         featureProgress.text = format(player.prai) + " / 10"
     }
-    else if(player.unlocking.has("kauraniai"))
+    else if(player.unlocking.has("kuaraniai"))
     {
         if(player.pr2.brought >= 10)
         {
-            unlock("kauraniai")
+            unlock("kuaraniai")
         }
-        featureText.style = sansSerifStyle(24,"#6812cc")
-        featureProgress.style = sansSerifStyle(48,"#6812cc")
+        featureText.style = danidanijrStyle(24,"#6812cc")
+        featureProgress.style = danidanijrStyle(48,"#6812cc")
         featureText.text = "PR2 Reset 10 times to unlock Kauraniai"
         featureProgress.text = player.pr2.brought + " / 10"
     }
@@ -211,9 +269,38 @@ function options(delta)
 
 function stats(delta)
 {
-    var tex = "You have gained " + format(player.stats.totalNumber,true) + " points total.\nYou have brought " + player.stats.totalUg1Brought + " UG1 total.\nYou have gained " + format(player.stats.totalPrai) + " total."
-    if(player.unlocked.has("ug2")) tex = tex + "\nYou have brought " + player.stats.totalUg2Brought + " UG2 total.\nYou have PR2 reset " + player.stats.totalPr2Brought + " total."
+    var tex = "You have gained " + format(player.stats.totalNumber,true) + " points total.\nYou have brought " + player.stats.totalUg1Brought + " UP1 total.\nYou have gained " + format(player.stats.totalPrai) + " total."
+    if(player.unlocked.has("ug2")) tex = tex + "\nYou have brought " + player.stats.totalUg2Brought + " UP2 total.\nYou have PR2 reset " + player.stats.totalPr2Brought + " total."
     statsInfo.text = tex
+}
+
+function kuaraniai(delta)
+{
+    kuaraniaiDisplay.text = "Kuaraniai: " + format(player.kuaraniai)
+    
+    kuaraniaiShardsDisplay.text = "Kuaraniai Shards: " + format(player.kuaraniaiShards,true)
+    
+    let time = new Date().getTime()
+    
+    kuaraniaiShardsProdDisplay.style = danidanijrStyle(36,getRainbowColour())
+    kuaraniaiShardsProdDisplay.y = 185 + Math.round(Math.cos(time * 0.003)) * 2
+    kuaraniaiShardsProdDisplay.text = format(calcProduction("KShards"),true) + "/s"
+    
+    kuaraniaiPowerDisplay.text = "Kuaraniai Power: " + format(player.kuaraniaiPower,true)
+    kuaraniaiPowerProdDisplay.style = danidanijrStyle(36,getRainbowColour(Math.PI))
+    kuaraniaiPowerProdDisplay.y = 435 + Math.round(Math.cos(time * 0.003)) * 2
+    kuaraniaiPowerProdDisplay.text = format(calcProduction("KPower"),true) + "/s"
+    
+    if(player.prai.equals(1))
+    {
+        praiSacrificeInfo.text = "You need to have more than 1 PRai to sacrifice.";
+        praiSacrificeButton.visible = false
+    }
+    else
+    {
+        praiSacrificeInfo.text = "You'll gain " + format(calcKuaraniaiGain()) + " Kuaraniai\nbut to a PR2 reset.";
+        praiSacrificeButton.visible = true
+    }
 }
 
 

@@ -65,7 +65,7 @@ function prestige(type)
         case "pr1":
             if(player.number.greaterThanOrEqualTo(1e6))
             {
-                success = true
+                success = true;
                 player.prai = player.prai.add(calcPRaiGain());
                 player.stats.totalPrai = player.stats.totalPrai.add(calcPRaiGain());
                 if(player.prai.greaterThanOrEqualTo(3) && !player.unlocking.has("pr2") && !pr2.visible) player.unlocking.push("pr2")                
@@ -74,7 +74,7 @@ function prestige(type)
         case "pr2":
             if(player.prai.greaterThanOrEqualTo(player.pr2.cost))
             {
-                success = true
+                success = true;
                 player.prai = new Decimal(1)
                 player.pr2.brought++
                 player.stats.totalPr2Brought++;
@@ -98,7 +98,7 @@ function prestige(type)
                 {
                     desc = "Reset ALL Your previous Progress, But gain multi to PRai and Cost reduction softcaps 3x later and 3x weaker."
                     size = 14
-                    player.unlocking.push("kauraniai");
+                    player.unlocking.push("kuaraniai");
                 }
                 if(player.pr2.brought == 5)
                 {
@@ -109,10 +109,15 @@ function prestige(type)
                     player.ug2.softcapStart *= 3
                     player.ug2.softcapStrength /= 3
                 }
-                
+
                 pr2.changeText([{text: "Requires: " + format(player.pr2.cost) + " PRai"},{text: desc,style: sansSerifStyle(size,"black",300)}])
+            }
+            break;
+        case "praiSac":
+            success = true;
+            player.kuaraniai = player.kuaraniai.add(calcKuaraniaiGain());
+            player.prai = new Decimal(1);
         }
-    }
     if(success)
     {
         player.number = new Decimal(0);
@@ -137,11 +142,13 @@ function switchTab(t)
     tabs[tab].draw(null,tabs[tab].colour,tabs[tab].selBorderColour)
 }
 
+//this calculates the number boost that your PRai gives
 function calcPRaiBoost()
 {
     return player.prai.minus(0.75).times(4);
 }
 
+//this calculates the PRai you will get when you PR1
 function calcPRaiGain()
 {
     if(player.pr2.brought == 0) return new Decimal(1)
@@ -152,6 +159,33 @@ function calcPRaiGain()
         
         return out;
     }
+}
+
+function calcKuaraniaiGain()
+{
+    var rate = player.kuaraniaiShardUpgrade >= 1 ? 0.0002 : 0.0001
+    return player.prai.times(rate)
+}
+
+function calcProduction(resource)
+{
+    let base;
+    switch(resource)
+    {
+        case "KPower":
+            base = player.kuaraniaiShards
+            if(player.kuaraniaiShardUpgrade >= 2) base = base.multiply(3)
+            return base
+        case "KShards":
+            base = player.kuaraniai 
+            if(player.kuaraniaiPowerUpgrade >= 1) base = base.multiply(5)
+            return base
+        case "number":
+            return player.speed.times(calcPRaiBoost())
+        default:
+            break;
+    }
+    return null
 }
 
 function unlock(feature)
@@ -190,8 +224,8 @@ function setLockState(feature,state)
             ug1autobuyer.setState(state);
             player.ug1.autobuyer = state;
             break;
-        case "kauraniai":
-            tabs.kauraniai.visible = state
+        case "kuaraniai":
+            tabs.kuaraniai.visible = state
             break;
     }
 }
@@ -208,6 +242,8 @@ function hardReset()
                 {
                     relock(feature)
                 });
+                if(player.kuaraniaiShardUpgrade > 0) kuaraniaiShardUpgradeButtons.setPosition(0)
+                if(player.kuaraniaiPowerUpgrade > 0) kuaraniaiPowerUpgradeButtons.setPosition(0)
                 player = setPlayerVaribles()
                 return true;
             }

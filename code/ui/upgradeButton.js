@@ -1,24 +1,31 @@
-function UpgradeButton(writing,effect,colour = 0x666666)
+function UpgradeButton(writing,effect,colour = 0x666666,borderColour = 0x000000,w = 0,h = 0)
 {
     PIXI.Container.call(this);
     
     this.writing = writing
     this.effect = effect
     this.colour = colour
+    this.borderColour = borderColour
+    this.w = w
+    this.h = h
+    
+    this.brightness = 1
     
     var texts = new Container()
     for(var t of writing)
     {
         let text = new PIXI.Text(t.text, t.style == undefined ? sansSerifStyle(24,"black") : t.style)
-        text.position.set(5,5 + texts.height)
+        if(t.x != undefined && t.y != undefined) text.position.set(t.x,t.y)
+        else text.position.set(5,5 + texts.height)
         this.text = text
         texts.addChild(text)
     }
     
     let background = new Graphics()
-    background.lineStyle(4,0x000000,1)
+    background.lineStyle(4,borderColour,1)
     background.beginFill(colour)
-    background.drawRect(0,0,texts.width + 10,texts.height + 10)
+    if(this.w == 0) background.drawRect(0,0,texts.width + 10,texts.height + 10)
+    else background.drawRect(0,0,this.w + 10,this.h + 10)
     background.endFill()
     this.addChild(background)
     
@@ -36,21 +43,21 @@ function UpgradeButton(writing,effect,colour = 0x666666)
     
     this.on("pointerover",function() 
     {
-        filter.brightness(1.3,false)
+        filter.brightness(1.3 * this.brightness,false)
     });
     this.on("pointerout",function() 
     {
-        filter.brightness(1,false)
+        filter.brightness(1 * this.brightness,false)
     });
     
     this.on("mousedown",function() 
     {
-        filter.brightness(0.8,false)
+        filter.brightness(0.8 * this.brightness,false)
     });
                     
     this.on("mouseup",function() 
     {
-        filter.brightness(1,false)
+        filter.brightness(1 * this.brightness,false)
         this.effect()
     })
     
@@ -59,18 +66,26 @@ function UpgradeButton(writing,effect,colour = 0x666666)
 }
 UpgradeButton.prototype = Object.create(PIXI.Container.prototype);
 
+UpgradeButton.prototype.setBrightness = function(amount)
+{
+    this.brightness = amount
+    
+    var filter = this.filters[0]
+    filter.brightness(this.brightness,false)
+}
+
 UpgradeButton.prototype.update = function(afford)
 {
     var filter = this.filters[0]
     if(afford && !this.interactive)
     {
         this.interactive = true;
-        filter.brightness(1,false)
+        filter.brightness(1 * this.brightness,false)
     }
     else if(!afford && this.interactive)
     {
         this.interactive = false;
-        filter.brightness(0.6,false)
+        filter.brightness(0.6 * this.brightness,false)
     }
 }
 
@@ -87,9 +102,10 @@ UpgradeButton.prototype.changeText = function(writing)
     }
     
     let background = new Graphics()
-    background.lineStyle(4,0x000000,1)
+    background.lineStyle(4,this.borderColour,1)
     background.beginFill(this.colour)
-    background.drawRect(0,0,texts.width + 10,texts.height + 10)
+    if(this.w == 0) background.drawRect(0,0,texts.width + 10,texts.height + 10)
+    else background.drawRect(0,0,this.w + 10,this.h + 10)
     background.endFill()
     this.addChild(background)
     

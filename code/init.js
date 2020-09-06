@@ -11,13 +11,14 @@ var generatorsTab,optionsTab,statsTab,kauraniaiTab
 let pointsDisplay,fpsDisplay,speedDisplay,ug1,ug1Info,pr1,praiDisplay,praiTime,featureText,featureProgress,pr2,ug2,ug2Info,ug1autobuyer,tabContainer,softcapText;
 let fullResetButton;
 let statsInfo;
+let kuaraniaiPowerUpgradeButtons,kuaraniaiShardUpgradeButtons,kuaraniaiDisplay,kuaraniaiShardsDisplay,kuaraniaiPowerDisplay,kuaraniaiShardsProdDisplay,kuaraniaiPowerProdDisplay,kauraniaiInfo,praiSacrificeInfo,praiSacrificeButton;
 //this are the acutal tab buttuns
 var tabs =
 {
     generators: null,
     options: null,
     stats: null,
-    kauraniai: null,
+    kuaraniai: null,
 }
 
 var inputs = {};
@@ -63,7 +64,12 @@ function setPlayerVaribles()
             totalPrai: new Decimal(1),
             totalUg2Brought: 0,
             totalPr2Brought: 0,
-        }
+        },
+        kuaraniai: new Decimal(0),
+        kuaraniaiShards: new Decimal(0),
+        kuaraniaiPower: new Decimal(0),
+        kuaraniaiShardUpgrade: 0,
+        kuaraniaiPowerUpgrade: 0,
     }
     return out
 }
@@ -72,3 +78,53 @@ var player = setPlayerVaribles()
 let app = new PIXI.Application({width: 960, height: 720});
 document.body.appendChild(app.view);
 var tab = null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

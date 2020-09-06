@@ -149,8 +149,22 @@ function sansSerifStyle(size = 36,colour = "white",wrap = -1)
         fontFamily: "sans-serif",
         fontSize: size,
         fill: colour,
-        //stroke: '#000000',
-        //strokeThickness: 1,
+    }
+    if(wrap >= 0)
+    {
+        out.wordWrap = true;
+        out.wordWrapWidth = wrap;
+    }
+    return new PIXI.TextStyle(out)
+}
+
+function danidanijrStyle(size = 36,colour = "white",wrap = -1)
+{
+    let out = 
+    {
+        fontFamily: "Danidanijrs Font,sans-serif",
+        fontSize: size,
+        fill: colour,
     }
     if(wrap >= 0)
     {
@@ -185,7 +199,7 @@ function format(x,fixed = false)
     else
     {
         if(lay == 0) mag = Math.log10(mag)
-        var m = Math.pow(10,mag % 1)
+        var m = Math.round(Math.pow(10,mag % 1) * 1e5) / 1e5
         
         if(fixed) return m.toFixed(2) + "e" + Math.floor(mag)
         else return (Math.floor(m * 100) / 100) + "e" + Math.floor(mag)
@@ -211,6 +225,25 @@ function formatTime(x)
     if(x >= 3600) out = (Math.floor(x / 3600) % 24) + "h " + out
     if(x >= 86400) out = Math.floor(x / 86400) + "d " + out
     return out
+}
+
+function getRainbowColour(offset = 0)
+{
+    let time = new Date().getTime();
+    let r = Math.sin(0.001 * time + offset) * 60 + 180;
+    let g = Math.sin(0.001 * time + (Math.PI * 2 / 3) + offset) * 60 + 180;
+    let b = Math.sin(0.001 * time + (Math.PI * 4 / 3) + offset) * 60 + 180;
+    
+    return "#" + pad(Math.round(r).toString(16),2) + pad(Math.round(g).toString(16),2) + pad(Math.round(b).toString(16),2)
+}
+
+function pad(num,length)
+{
+    while(num.length < length)
+    {
+        num = "0" + num
+    }
+    return num
 }
 
 
