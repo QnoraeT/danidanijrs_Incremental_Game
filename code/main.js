@@ -185,7 +185,6 @@ function setup()
     praiSacrificeButton.visible = false;
     kuaraniaiTab.addChild(praiSacrificeButton)
     
-    dev();
     tab = "generators"
     app.ticker.add(delta => gameLoop(delta));
 }
