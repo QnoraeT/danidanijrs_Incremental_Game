@@ -8,7 +8,7 @@ let Graphics = PIXI.Graphics
 
 //ui delements
 var generatorsTab,optionsTab,statsTab,kauraniaiTab
-let pointsDisplay,fpsDisplay,speedDisplay,ug1,ug1Info,pr1,praiDisplay,praiTime,featureText,featureProgress,pr2,ug2,ug2Info,ug1autobuyer,tabContainer,softcapText;
+let pointsDisplay,fpsDisplay,speedDisplay,ug1,ug1Info,pr1,praiDisplay,praiTime,featureText,featureProgress,pr2,ug2,ug2Info,ug1autobuyer,tabContainer,softcapText,ug2autobuyer,pr1autobuyer,pr1autobuyerThresholdButton,pr1autobuyerThresholdText;
 let fullResetButton;
 let statsInfo;
 let kuaraniaiPowerUpgradeButtons,kuaraniaiShardUpgradeButtons,kuaraniaiDisplay,kuaraniaiShardsDisplay,kuaraniaiPowerDisplay,kuaraniaiShardsProdDisplay,kuaraniaiPowerProdDisplay,kauraniaiInfo,praiSacrificeInfo,praiSacrificeButton;
@@ -49,12 +49,15 @@ function setPlayerVaribles()
         {
             cost: new Decimal(100000),
             brought: 0,
+            autobuyer: false,
             xScaleStart: 15,
             xScaleStrength: 1,
             softcapStart: 10,
             softcapStrength: 1,
         },
         prai: new Decimal(1),
+        pr1autobuyer: false,
+        pr1threshhold: new Decimal(1),
         unlocking: new List(),
         unlocked: new List(),
         stats:
@@ -66,6 +69,11 @@ function setPlayerVaribles()
             totalPr2Brought: 0,
         },
         kuaraniai: new Decimal(0),
+        kuaraniaiGainSoftcaps:
+        {
+            normalStart: new Decimal(2),
+            normalStrength: 1,
+        },
         kuaraniaiShards: new Decimal(0),
         kuaraniaiPower: new Decimal(0),
         kuaraniaiShardUpgrade: 0,

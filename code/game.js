@@ -72,7 +72,7 @@ function prestige(type)
             }
             break;
         case "pr2":
-            if(player.prai.greaterThanOrEqualTo(player.pr2.cost))
+            if(player.prai.greaterThanOrEqualTo(calcPr2CostEffects()))
             {
                 success = true;
                 player.prai = new Decimal(1)
@@ -81,13 +81,12 @@ function prestige(type)
                 //cost scaling
                 player.pr2.cost = player.pr2.cost.add((player.pr2.brought * 10) + 10)
                 
+                //scaling upgrade changes after the softcap
+                
                 //changes the text on the button for next time and gives addition rewards
-                var desc = "Reset ALL Your progress, But gain muti to PR1"
-                var size = 18
                 
                 if(player.pr2.brought == 1)
                 {
-                    desc = "Reset ALL Your progress, But gain muti to PR1 and a Speed autobuyer."
                     unlock("ug2")
                 }
                 if(player.pr2.brought == 2)
@@ -96,8 +95,6 @@ function prestige(type)
                 }
                 if(player.pr2.brought == 4)
                 {
-                    desc = "Reset ALL Your previous Progress, But gain multi to PRai and Cost reduction softcaps 3x later and 3x weaker."
-                    size = 14
                     player.unlocking.push("kuaraniai");
                 }
                 if(player.pr2.brought == 5)
@@ -110,13 +107,15 @@ function prestige(type)
                     player.ug2.softcapStrength /= 3
                 }
 
-                pr2.changeText([{text: "Requires: " + format(player.pr2.cost) + " PRai"},{text: desc,style: sansSerifStyle(size,"black",300)}])
+                updatePr2Element()
             }
             break;
         case "praiSac":
             success = true;
             player.kuaraniai = player.kuaraniai.add(calcKuaraniaiGain());
-            player.prai = new Decimal(1);
+            
+            if(player.kuaraniaiShardUpgrade >= 5) player.prai = player.prai.root(4)
+            else player.prai = new Decimal(1);
         }
     if(success)
     {
@@ -133,6 +132,24 @@ function prestige(type)
     }
 }
 
+function updatePr2Element()
+{
+    var desc = "Reset ALL Your progress, But gain muti to PR1"
+    var size = 18
+                
+    if(player.pr2.brought == 1)
+    {
+        desc = "Reset ALL Your progress, But gain muti to PR1 and a Speed autobuyer."
+    }
+    else if(player.pr2.brought == 4)
+    {
+        desc = "Reset ALL Your previous Progress, But gain multi to PRai and Cost reduction softcaps 3x later and 3x weaker."
+        size = 14
+    } 
+    
+    pr2.changeText([{text: "Requires: " + format(calcPr2CostEffects(),player.kuaraniaiShardUpgrade >= 2) + " PRai"},{text: desc,style: sansSerifStyle(size,"black",300)}])
+}
+
 function switchTab(t)
 {
     tabs[tab].draw(null,tabs[tab].colour,tabs[tab].borderColour)
@@ -145,7 +162,9 @@ function switchTab(t)
 //this calculates the number boost that your PRai gives
 function calcPRaiBoost()
 {
-    return player.prai.minus(0.75).times(4);
+    var out = player.prai.minus(0.75).times(4)
+    if(player.kuaraniaiShardUpgrade >= 3) out = out.multiply(Decimal.pow(player.kuaraniaiShards,Decimal.minus(1,(Decimal.divide(10,player.kuaraniaiShards.slog().add(11))))))
+    return out;
 }
 
 //this calculates the PRai you will get when you PR1
@@ -162,9 +181,17 @@ function calcPRaiGain()
 }
 
 function calcKuaraniaiGain()
-{
+{   
     var rate = player.kuaraniaiShardUpgrade >= 1 ? 0.0002 : 0.0001
-    return player.prai.times(rate)
+    
+    if(player.kuaraniaiPowerUpgrade >= 2) rate *= 1.5;
+    
+    var amount = player.prai.times(rate)
+    
+    //softcaps
+    if(amount.greaterThan(player.kuaraniaiGainSoftcaps.normalStart)) amount = Decimal.root(amount.minus(player.kuaraniaiGainSoftcaps.normalStart),1 + ((1/3) * player.kuaraniaiGainSoftcaps.normalStrength)).add(player.kuaraniaiGainSoftcaps.normalStart)
+    
+    return amount
 }
 
 function calcProduction(resource)
@@ -174,7 +201,17 @@ function calcProduction(resource)
     {
         case "KPower":
             base = player.kuaraniaiShards
+            
+            //KShard upgrade mutis
             if(player.kuaraniaiShardUpgrade >= 2) base = base.multiply(3)
+            
+            //KPower upgrade mutis
+            if(player.kuaraniaiPowerUpgrade >= 1) 
+            {
+                //idk if its sqrt or log. i went log cos its says so on one of the upgrades
+                if(player.kuaraniaiShardUpgrade >= 7) base = base.multiply(player.ug1.reduction.log(5.6).add(Decimal.root(player.ug1.reduction,4)).add(1))
+                else base = base.multiply(player.ug1.reduction.log(5.6).add(1))
+            }
             return base
         case "KShards":
             base = player.kuaraniai 
@@ -206,6 +243,15 @@ function relock(feature)
     setLockState(feature,false)
 }
 
+function calcPr2CostEffects()
+{
+    var out = player.pr2.cost
+    
+    if(player.kuaraniaiShardUpgrade >= 2) out = out.times(Decimal.divide(1,  Decimal.log10(Decimal.log10(((Decimal.slog(player.kuaraniaiShards).add(1)).divide(2)).add(1)).add(2))).divide(3.321928094887363))
+    
+    return out
+}
+
 
 function setLockState(feature,state)
 {
@@ -223,6 +269,18 @@ function setLockState(feature,state)
             ug1autobuyer.visible = state
             ug1autobuyer.setState(state);
             player.ug1.autobuyer = state;
+            break;
+        case "ug2autobuyer":
+            ug2autobuyer.visible = state
+            ug2autobuyer.setState(state);
+            player.ug2.autobuyer = state;
+            break;
+        case "pr1autobuyer":
+            pr1autobuyer.visible = state
+            pr1autobuyer.setState(state);
+            pr1autobuyerThresholdButton.visible = state;
+            pr1autobuyerThresholdText.visible = state;
+            player.pr1autobuyer = state;
             break;
         case "kuaraniai":
             tabs.kuaraniai.visible = state

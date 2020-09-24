@@ -13,7 +13,7 @@ function dev()
     unlock("kuaraniai")
     player.pr2.brought = 3
     player.prai = new Decimal(500)
-    player.kuaraniai = new Decimal(0.001)
+    player.kuaraniai = new Decimal(1e6)
 }
 
 function setup()
@@ -75,12 +75,27 @@ function setup()
     generatorsTab.addChild(pr1)
     
     praiDisplay = new PIXI.Text("",danidanijrStyle(24))
-    praiDisplay.position.set(48,600);
+    praiDisplay.position.set(48,590);
     generatorsTab.addChild(praiDisplay);
     
     praiTime = new PIXI.Text("",danidanijrStyle(24))
-    praiTime.position.set(48,630);
+    praiTime.position.set(48,620);
     generatorsTab.addChild(praiTime);
+    
+    pr1autobuyer = new TickBox("Enable PR1 autobuyer?",function() {player.pr1autobuyer = pr1autobuyer.getState()},false);
+    pr1autobuyer.position.set(48,650);
+    pr1autobuyer.visible = false;
+    generatorsTab.addChild(pr1autobuyer);
+    
+    pr1autobuyerThresholdButton = new Button("Change Threshold",function(){player.pr1threshhold = new Decimal(prompt("Enter the new theshold where the pr1autobuyer will pr1","1"))})
+    pr1autobuyerThresholdButton.position.set(48,680)
+    pr1autobuyerThresholdButton.visible = false
+    generatorsTab.addChild(pr1autobuyerThresholdButton);
+    
+    pr1autobuyerThresholdText = new PIXI.Text("PRai threshold: 1",danidanijrStyle(30))
+    pr1autobuyerThresholdText.position.set(263,690)
+    pr1autobuyerThresholdText.visible = false
+    generatorsTab.addChild(pr1autobuyerThresholdText);
     
     featureText = new PIXI.Text("",danidanijrStyle(24,"#ff9b96"))
     featureText.position.set(480,150);
@@ -109,6 +124,11 @@ function setup()
     ug2Info.anchor.set(0,0);
     ug2Info.visible = false
     generatorsTab.addChild(ug2Info);
+    
+    ug2autobuyer = new TickBox("Enable UG2 autobuyer?",function() {player.ug2.autobuyer = ug2autobuyer.getState()},false);
+    ug2autobuyer.position.set(602,440);
+    ug2autobuyer.visible = false;
+    generatorsTab.addChild(ug2autobuyer);
     
     softcapText = new PIXI.Text("(softcapped)",sansSerifStyle(48,"red"))
     softcapText.position.set(602,265);
@@ -185,6 +205,7 @@ function setup()
     praiSacrificeButton.visible = false;
     kuaraniaiTab.addChild(praiSacrificeButton)
     
+    dev()
     tab = "generators"
     app.ticker.add(delta => gameLoop(delta));
 }
@@ -200,6 +221,8 @@ function gameLoop(delta)
     player.number = player.number.add(calcProduction("number").divide(new Decimal(app.ticker.FPS)))
     player.stats.totalNumber = player.stats.totalNumber.add(calcProduction("number").divide(app.ticker.FPS))
     if(player.unlocked.has("ug1autobuyer") && player.ug1.autobuyer) buyUg1();
+    if(player.unlocked.has("ug2autobuyer") && player.ug2.autobuyer) buyUg2();
+    if(player.unlocked.has("pr1autobuyer") && player.pr1autobuyer && calcPRaiGain().greaterThan(player.pr1threshhold)) prestige("pr1");
     
     //kuaraniai numbers
     player.kuaraniaiShards = player.kuaraniaiShards.add(calcProduction("KShards").divide(app.ticker.FPS));
@@ -216,7 +239,7 @@ function generators(delta)
     if(player.unlocked.has("ug2")) ug1Info.text = "Cost reduction:" + format(player.ug1.reduction) + "\nUpgrade Speed, Need " + format(player.ug1.cost.divide(player.ug1.reduction)) + "\nYou brought this " + player.ug1.brought + " times";
     else ug1Info.text = "\nUpgrade Speed, Need " + format(player.ug1.cost.divide(player.ug1.reduction)) + "\nYou brought this " + player.ug1.brought + " times";
        
-    praiDisplay.text = "You have " + format(player.prai) + " PRai which boosts your generation by x" + format(calcPRaiBoost());
+    praiDisplay.text = "You have " + format(player.prai) + " PRai which boosts your generation by x" + format(calcPRaiBoost(),player.kuaraniaiShardUpgrade >= 2);
     if(player.number.lessThan(1e6) || ((player.number.greaterThanOrEqualTo(1e6)) && player.pr2.brought == 0))
     {
         praiTime.text = "It would take " + formatTime(new Decimal(1e6).minus(player.number).divide(player.speed.times(calcPRaiBoost()))) + " to get to " + format(new Decimal(1e6));
@@ -226,11 +249,14 @@ function generators(delta)
     ug1.update(player.number.greaterThanOrEqualTo(player.ug1.cost.divide(player.ug1.reduction)));
     pr1.update(player.number.greaterThanOrEqualTo(1e6));
     pr2.update(player.prai.greaterThanOrEqualTo(player.pr2.cost));
+    if(player.unlocked.has("pr2")) updatePr2Element();
     ug2.update(player.number.greaterThanOrEqualTo(player.ug2.cost));
     
     ug2Info.text = "Reduce cost: " + format(player.ug2.cost) + "\nYou brought this " + player.ug2.brought + " times"
     if(player.unlocked.has("ug2") && player.ug2.brought >= player.ug2.softcapStart) softcapText.visible = true
     else softcapText.visible = false
+    
+    pr1autobuyerThresholdText.text = "Prai Threshhold: " + format(player.pr1threshhold);
     
     if(player.unlocking.has("pr2"))
     {
@@ -268,7 +294,7 @@ function options(delta)
 
 function stats(delta)
 {
-    var tex = "You have gained " + format(player.stats.totalNumber,true) + " points total.\nYou have brought " + player.stats.totalUg1Brought + " UP1 total.\nYou have gained " + format(player.stats.totalPrai) + " total."
+    var tex = "You have gained " + format(player.stats.totalNumber,true) + " points total.\nYou have brought " + player.stats.totalUg1Brought + " UP1 total.\nYou have gained " + format(player.stats.totalPrai) + " PRai total."
     if(player.unlocked.has("ug2")) tex = tex + "\nYou have brought " + player.stats.totalUg2Brought + " UP2 total.\nYou have PR2 reset " + player.stats.totalPr2Brought + " total."
     statsInfo.text = tex
 }
