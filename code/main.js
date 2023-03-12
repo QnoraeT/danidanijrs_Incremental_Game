@@ -210,51 +210,24 @@ function setup()
 }
 
 var reccentFPS = []
-function getUPGCosts(amount,upgType)
-    {
-        let base;
-        let Nscale;
-        let effective = amount;
-        switch(upgType)
-        {
-            case "UPG1":
-                base = new Decimal(10)
-                Nscale = new Decimal(1.6)
-                if (amount.gte(player.ug1.xScaleStart)){
-                    effective = effective.div(player.ug1.xScaleStart).pow(player.ug1.xScaleStrength).mul(player.ug1.xScaleStart)
-                }
-                base = Nscale.pow(effective)
-                return base
-            case "UPG2":
-                base = new Decimal(100000)
-                Nscale = new Decimal(1.4)
-                if (amount.gte(player.ug2.xScaleStart)){
-                    effective = effective.div(player.ug2.xScaleStart).pow(player.ug2.xScaleStrength).mul(player.ug2.xScaleStart)
-                }
-                base = Nscale.pow(effective)
-                return base
-            default:
-                break;
-        }
-        return null
-    }
 
 function gameLoop(delta)
-{
+{ 
+    updateScalingSoftcaps()
+    player.kuaraniaiShards = player.kuaraniaiShards.add(calcProduction("KShards").divide(app.ticker.FPS));
+    player.kuaraniaiPower = player.kuaraniaiPower.add(calcProduction("KPower").divide(app.ticker.FPS));
+    player.ug2.cost = getUPGCosts(player.ug2.bought,"UPG2")
+    player.ug1.cost = getUPGCosts(player.ug1.bought,"UPG1")
+    player.speed = calcProduction("speed")
     pointsDisplay.text = format(player.number,true);
     fpsDisplay.text = Math.round(app.ticker.FPS) + " FPS"
-    speedDisplay.text = "Speed: " + format(calcProduction("number"));
-    
+    speedDisplay.text = format(calcProduction("number")) + "/s";
     player.number = player.number.add(calcProduction("number").divide(new Decimal(app.ticker.FPS)))
     player.stats.totalNumber = player.stats.totalNumber.add(calcProduction("number").divide(app.ticker.FPS))
     if(player.unlocked.has("ug1autobuyer") && player.ug1.autobuyer) buyUg1();
     if(player.unlocked.has("ug2autobuyer") && player.ug2.autobuyer) buyUg2();
     if(player.unlocked.has("pr1autobuyer") && player.pr1autobuyer && calcPRaiGain().greaterThan(player.pr1threshhold)) prestige("pr1");
-    
-    //kuaraniai numbers
-    player.kuaraniaiShards = player.kuaraniaiShards.add(calcProduction("KShards").divide(app.ticker.FPS));
-    player.kuaraniaiPower = player.kuaraniaiPower.add(calcProduction("KPower").divide(app.ticker.FPS));
-    
+
     if(tab == "generators") generators(delta)
     else if(tab == "options") options(delta)
     else if (tab == "stats") stats(delta)
@@ -263,8 +236,8 @@ function gameLoop(delta)
 
 function generators(delta)
 {
-    if(player.unlocked.has("ug2")) ug1Info.text = "Cost reduction:" + format(player.ug1.reduction) + "\nUpgrade Speed, Need " + format(player.ug1.cost.divide(player.ug1.reduction)) + "\nYou bought this " + player.ug1.bought + " times";
-    else ug1Info.text = "\nUpgrade Speed, Need " + format(player.ug1.cost.divide(player.ug1.reduction)) + "\nYou bought this " + player.ug1.bought + " times";
+    if(player.unlocked.has("ug2")) ug1Info.text = "Cost reduction:" + format(player.ug1.reduction) + "\nUpgrade Speed, Need " + format(player.ug1.cost) + "\nYou bought this " + player.ug1.bought + " times";
+    else ug1Info.text = "\nUpgrade Speed, Need " + format(player.ug1.cost) + "\nYou bought this " + player.ug1.bought + " times";
        
     praiDisplay.text = "You have " + format(player.prai) + " PRai which boosts your generation by x" + format(calcPRaiBoost(),player.kuaraniaiShardUpgrade >= 2);
     if(player.number.lessThan(1e6) || ((player.number.greaterThanOrEqualTo(1e6)) && player.pr2.bought == 0))
@@ -273,14 +246,14 @@ function generators(delta)
     }
     else praiTime.text = "You would gain " + format(calcPRaiGain()) + " PRai."
     
-    ug1.update(player.number.greaterThanOrEqualTo(player.ug1.cost.divide(player.ug1.reduction)));
+    ug1.update(player.number.greaterThanOrEqualTo(player.ug1.cost));
     pr1.update(player.number.greaterThanOrEqualTo(1e6));
     pr2.update(player.prai.greaterThanOrEqualTo(player.pr2.cost));
     if(player.unlocked.has("pr2")) updatePr2Element();
     ug2.update(player.number.greaterThanOrEqualTo(player.ug2.cost));
     
     ug2Info.text = "Reduce cost: " + format(player.ug2.cost) + "\nYou bought this " + player.ug2.bought + " times"
-    if(player.unlocked.has("ug2") && player.ug2.bought >= player.ug2.softcapStart) softcapText.visible = true
+    if(player.unlocked.has("ug2") && player.ug2.bought.gte(player.ug2.softcapStart)) softcapText.visible = true
     else softcapText.visible = false
     
     pr1autobuyerThresholdText.text = "Prai Threshhold: " + format(player.pr1threshhold);
@@ -298,14 +271,14 @@ function generators(delta)
     }
     else if(player.unlocking.has("kuaraniai"))
     {
-        if(player.pr2.bought >= 10)
+        if(player.pr2.bought.gte(10))
         {
             unlock("kuaraniai")
         }
         featureText.style = danidanijrStyle(24,"#6812cc")
         featureProgress.style = danidanijrStyle(48,"#6812cc")
-        featureText.text = "PR2 Reset 10 times to unlock Kauraniai"
-        featureProgress.text = player.pr2.bought + " / 10"
+        featureText.text = "PR2 Reset 10 times to unlock Kuaraniai"
+        featureProgress.text = format(player.pr2.bought) + " / 10"
     }
     else
     {
@@ -321,8 +294,8 @@ function options(delta)
 
 function stats(delta)
 {
-    var tex = "You have gained " + format(player.stats.totalNumber,true) + " points total.\nYou have bought " + player.stats.totalUg1bought + " UP1 total.\nYou have gained " + format(player.stats.totalPrai) + " PRai total."
-    if(player.unlocked.has("ug2")) tex = tex + "\nYou have bought " + player.stats.totalUg2bought + " UP2 total.\nYou have PR2 reset " + player.stats.totalPr2bought + " total."
+    var tex = "You have gained " + format(player.stats.totalNumber,true) + " points total.\nYou have bought " + format(player.stats.totalUg1bought) + " UP1 total.\nYou have gained " + format(player.stats.totalPrai) + " PRai total."
+    if(player.unlocked.has("ug2")) tex = tex + "\nYou have bought " + format(player.stats.totalUg2bought) + " UP2 total.\nYou have PR2 reset " + format(player.stats.totalPr2bought) + " total."
     statsInfo.text = tex
 }
 

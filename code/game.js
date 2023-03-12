@@ -5,15 +5,13 @@ function buyUg1()
     if(player.number.greaterThan(player.ug1.cost))
     {
         player.number = player.number.minus(player.ug1.cost);
-        player.ug1.bought++;
-        player.stats.totalUg1bought++
-        if(player.ug1.bought >= player.ug1.xScaleStart)
-        {
-            var a = player.ug1.bought.subtract(player.ug1.xScaleStart)
+        player.ug1.bought=player.ug1.bought.add(1);
+        player.stats.totalUg1bought=player.stats.totalUg1bought.add(1);
+        if(player.ug1.bought.gte(player.ug1.xScaleStart)){
             ug1.changeText([{text: "Upgrade\nScaled Speed"}])
             ug2.changeText([{text: "Decrease\nScaled Speed Cost"}])
-        
         }
+
     }
 }
 
@@ -22,19 +20,21 @@ function buyUg2()
     if(player.number.greaterThan(player.ug2.cost))
     {
         player.number = player.number.minus(player.ug2.cost);
-        player.ug2.bought++;
-        player.stats.totalUg2bought++
-        //softcaps
-        var muti = new Decimal(1.2)
-        if(player.ug2.bought > player.ug2.softcapStart)
-        {
-            muti = /*(*/muti.divide((((1 + (12 / (player.ug2.bought * 10 * player.ug2.softcapStrength))) - 1)/ 2) + 1)//).times(player.ug2.bought)
-        }
-        if(muti.lessThan(1)) muti = new Decimal(1)
-        player.ug1.reduction = player.ug1.reduction.times(muti);
-        player.ug2.cost = getUPGCosts(player.ug2.bought,UPG1)
-
+        player.ug2.bought=player.ug2.bought.add(1);
+        player.stats.totalUg2bought=player.stats.totalUg2bought.add(1);
     }
+}
+function updateScalingSoftcaps(){
+let x
+let y
+x = new Decimal (10)
+y = new Decimal (0.5)
+if (player.pr2.bought.gte(5)){
+x = x.mul(3)
+y = y.div(1.3)}
+player.ug2.softcapStart = x
+player.ug2.softcapStrength = y
+
 }
 
 function prestige(type)
@@ -55,38 +55,24 @@ function prestige(type)
             if(player.prai.greaterThanOrEqualTo(calcPr2CostEffects()))
             {
                 success = true;
-                player.prai = new Decimal(1)
-                player.pr2.bought++
-                player.stats.totalPr2bought++;
-                //cost scaling
-                player.pr2.cost = player.pr2.cost.add((player.pr2.bought * 10) + 10)
-                
+                player.prai = new Decimal(1);
+                player.pr2.bought=player.pr2.bought.add(1);
+                player.stats.totalPr2bought=player.stats.totalPr2bought.add(1);
                 //scaling upgrade changes after the softcap
                 
                 //changes the text on the button for next time and gives addition rewards
                 
-                if(player.pr2.bought == 1)
+                if(player.pr2.bought.equals(1))
                 {
                     unlock("ug2")
                 }
-                if(player.pr2.bought == 2)
+                if(player.pr2.bought.equals(2))
                 {
                     unlock("ug1autobuyer")
                 }
-                if(player.pr2.bought == 4)
+                if(player.pr2.bought.equals(4))
                 {
-                    player.unlocking.push("kuaraniai");
-                }
-                if(player.pr2.bought == 5)
-                {
-                    player.ug1.xScaleStart *= 3
-                    player.ug1.xScaleStrength /= 3
-                    player.ug2.xScaleStart *= 3
-                    player.ug2.xScaleStrength /= 3
-                    player.ug2.softcapStart *= 3
-                    player.ug2.softcapStrength /= 3
-                }
-
+                    player.unlocking.push("kuaraniai");}
                 updatePr2Element()
             }
             break;
@@ -103,12 +89,12 @@ function prestige(type)
         player.speed = new Decimal(1);
         ug1.changeText([{text: "Upgrade\nSpeed"}])
         player.ug1.cost = new Decimal(5)
-        player.ug1.bought = 0
+        player.ug1.bought = new Decimal(0)
         player.ug1.reduction = new Decimal(1)
 
         ug2.changeText([{text: "Decrease\nSpeed Cost"}])
         player.ug2.cost = new Decimal(100000)
-        player.ug2.bought = 0
+        player.ug2.bought = new Decimal(0)
     }
 }
 
@@ -117,11 +103,11 @@ function updatePr2Element()
     var desc = "Reset your current progress to gain a multiplier to PRai."
     var size = 18
                 
-    if(player.pr2.bought == 1)
+    if(player.pr2.bought.equ(1))
     {
         desc = "Reset your current progress to gain a multiplier to PRai and a speed autobuyer."
     }
-    else if(player.pr2.bought == 4)
+    else if(player.pr2.bought.equ(4))
     {
         desc = "Reset your current progress to gain a multiplier to PRai, and make the cost reduction softcap 30% weaker and start 3x later."
         size = 14
@@ -150,11 +136,11 @@ function calcPRaiBoost()
 //this calculates the PRai you will get when you PR1
 function calcPRaiGain()
 {
-    if(player.pr2.bought == 0) return new Decimal(1)
+    if(player.pr2.bought.equals(0)) return new Decimal(1)
     else 
     {
         var out = Decimal.root(player.number.divide(1e6),4);
-        if((player.pr2.bought >= 2)) out = out.multiply(new Decimal(player.pr2.bought).pow(1.25));
+        if((player.pr2.bought.gte(2))) out = out.multiply(player.pr2.bought.pow(1.25));
         
         return out;
     }
@@ -169,8 +155,9 @@ function calcKuaraniaiGain()
     var amount = player.prai.times(rate)
     
     //softcaps
-    if(amount.greaterThan(player.kuaraniaiGainSoftcaps.normalStart)) amount = Decimal.root(amount.minus(player.kuaraniaiGainSoftcaps.normalStart),1 + ((1/3) * player.kuaraniaiGainSoftcaps.normalStrength)).add(player.kuaraniaiGainSoftcaps.normalStart)
-    
+    if(amount.greaterThan(player.kuaraniaiGainSoftcaps.normalStart)){
+    amount = amount.div(player.kuaraniaiGainSoftcaps.normalStart).pow(player.kuaraniaiGainSoftcaps.normalStrength).mul(player.kuaraniaiGainSoftcaps.normalStart)
+    }
     return amount
 }
 
@@ -199,6 +186,9 @@ function calcProduction(resource)
             return base
         case "number":
             return player.speed.times(calcPRaiBoost())
+        case "speed":
+            base = new Decimal(1.5)
+            return base.pow(player.ug1.bought).mul(4)
         default:
             break;
     }
@@ -267,6 +257,53 @@ function setLockState(feature,state)
             break;
     }
 }
+function getUPGCosts(amount,upgType)
+    {
+        let base;
+        let Nscale;
+        let effective = amount;
+        let effStart;
+        switch(upgType)
+        {
+            case "UPG1":
+                base = new Decimal(5)
+                Nscale = new Decimal(1.6)
+                if (amount.gte(player.ug1.xScaleStart)){
+                    effective = effective.div(player.ug1.xScaleStart).pow(player.ug1.xScaleStrength).mul(player.ug1.xScaleStart)
+                }
+                if (amount.gte(player.ug1.SuperScaleStart)){
+                    effStart = player.ug1.SuperScaleStart.div(player.ug1.xScaleStart).pow(player.ug1.xScaleStrength).mul(player.ug1.xScaleStart)
+                    effective = effective.div(effStart).pow(player.ug1.SuperScaleStrength).mul(effStart)
+                }
+                base = Nscale.pow(effective).mul(base)
+                // UP2 reduction
+                let UP2base = new Decimal(1.2)
+                reduction = UP2base.pow(player.ug2.bought)
+                if (reduction.gte(player.ug2.softcapStart)){
+                    reduction.pow((new Decimal(1).sub(player.ug2.softcapStrength)).add(player.ug2.softcapStrength.div((reduction.log10().div(player.ug2.softcapStart.log10())).pow(player.ug2.softcapStrength))))
+                }
+                player.ug1.reduction=reduction
+                base = base.div(reduction)
+                return base
+            case "UPG2":
+                base = new Decimal(100000)
+                Nscale = new Decimal(1.4)
+                if (amount.gte(player.ug2.xScaleStart)){
+                    effective = effective.div(player.ug2.xScaleStart).pow(player.ug2.xScaleStrength).mul(player.ug2.xScaleStart)
+                }
+                if (amount.gte(player.ug2.SuperScaleStart)){
+                    effStart = player.ug2.SuperScaleStart.div(player.ug2.xScaleStart).pow(player.ug2.xScaleStrength).mul(player.ug2.xScaleStart)
+                    effective = effective.div(effStart).pow(player.ug2.SuperScaleStrength).mul(effStart)
+                }
+                base = Nscale.pow(effective).mul(base)
+                return base
+            case "PR2":
+                return effective.pow(2).mul(5).add(effective.mul(15)).add(10) // 5x^2 + 15x + 10, calculated from previous sequence
+            default:
+                break;
+        }
+        return null
+    }
 
 function hardReset()
 {
