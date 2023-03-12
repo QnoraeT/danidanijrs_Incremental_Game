@@ -1,27 +1,19 @@
+
+
 function buyUg1()
 {
-    if(player.number.greaterThan(player.ug1.cost.divide(player.ug1.reduction)))
+    if(player.number.greaterThan(player.ug1.cost))
     {
-        player.number = player.number.minus(player.ug1.cost.divide(player.ug1.reduction));
-        player.ug1.brought++;
-        player.stats.totalUg1Brought++
-        player.speed = player.speed.multiply(1.5)
-        player.ug1.cost = player.ug1.cost.multiply(1.55);
-        if(player.ug1.brought >= player.ug1.xScaleStart)
+        player.number = player.number.minus(player.ug1.cost);
+        player.ug1.bought++;
+        player.stats.totalUg1bought++
+        if(player.ug1.bought >= player.ug1.xScaleStart)
         {
-            var a = player.ug1.brought
-            player.ug1.cost = player.ug1.cost.multiply(1 + (((a - (player.ug1.xScaleStart - 1)) / (Math.sqrt(a * 5) + Math.log10(a))) * (player.ug1.xScaleStrength / 2)));
-            /*for(var a = 0 ; a < player.generaters.ug1.brought + 1; a++)
-            {
-                if(a >= 15)
-                {
-                    player.generaters.ug1.cost = player.generaters.ug1.cost.multiply(1 + (((a - (15 - 1)) / (Math.sqrt(a * 5) + Math.log10(a))) * (1 / 2)));
-                }
-            }*/
-            ug1.changeText([{text: "Upgrade\nXScaled Speed"}])
-            ug2.changeText([{text: "Decrease\nXScaled Speed Cost"}])
+            var a = player.ug1.bought.subtract(player.ug1.xScaleStart)
+            ug1.changeText([{text: "Upgrade\nScaled Speed"}])
+            ug2.changeText([{text: "Decrease\nScaled Speed Cost"}])
+        
         }
-        //if(player.ug1.brought >= 15) ug1.changeText([{text: "Upgrade\nXScaled Speed"}])
     }
 }
 
@@ -30,30 +22,18 @@ function buyUg2()
     if(player.number.greaterThan(player.ug2.cost))
     {
         player.number = player.number.minus(player.ug2.cost);
-        player.ug2.brought++;
-        player.stats.totalUg2Brought++
+        player.ug2.bought++;
+        player.stats.totalUg2bought++
         //softcaps
         var muti = new Decimal(1.2)
-        if(player.ug2.brought > player.ug2.softcapStart)
+        if(player.ug2.bought > player.ug2.softcapStart)
         {
-            muti = /*(*/muti.divide((((1 + (12 / (player.ug2.brought * 10 * player.ug2.softcapStrength))) - 1)/ 2) + 1)//).times(player.ug2.brought)
+            muti = /*(*/muti.divide((((1 + (12 / (player.ug2.bought * 10 * player.ug2.softcapStrength))) - 1)/ 2) + 1)//).times(player.ug2.bought)
         }
         if(muti.lessThan(1)) muti = new Decimal(1)
         player.ug1.reduction = player.ug1.reduction.times(muti);
-        //cost scaling
-        player.ug2.cost = player.ug2.cost.multiply(1.4);
-        if(player.ug2.brought >= player.ug2.xScaleStart)
-        {
-            var a = player.ug2.brought
-            player.ug2.cost = player.ug2.cost.multiply(1 + (((a - (player.ug2.xScaleStart - 1)) / (Math.sqrt(a * 5) + Math.log10(a))) * player.ug2.xScaleStrength));
-            /*for(var a = 0 ; a < player.generaters.ug1.brought + 1; a++)
-            {
-                if(a >= 15)
-                {
-                    player.generaters.ug1.cost = player.generaters.ug1.cost.multiply(1 + (((a - (15 - 1)) / (Math.sqrt(a * 5) + Math.log10(a))) * (1 / 2)));
-                }
-            }*/
-        }
+        player.ug2.cost = getUPGCosts(player.ug2.bought,UPG1)
+
     }
 }
 
@@ -76,28 +56,28 @@ function prestige(type)
             {
                 success = true;
                 player.prai = new Decimal(1)
-                player.pr2.brought++
-                player.stats.totalPr2Brought++;
+                player.pr2.bought++
+                player.stats.totalPr2bought++;
                 //cost scaling
-                player.pr2.cost = player.pr2.cost.add((player.pr2.brought * 10) + 10)
+                player.pr2.cost = player.pr2.cost.add((player.pr2.bought * 10) + 10)
                 
                 //scaling upgrade changes after the softcap
                 
                 //changes the text on the button for next time and gives addition rewards
                 
-                if(player.pr2.brought == 1)
+                if(player.pr2.bought == 1)
                 {
                     unlock("ug2")
                 }
-                if(player.pr2.brought == 2)
+                if(player.pr2.bought == 2)
                 {
                     unlock("ug1autobuyer")
                 }
-                if(player.pr2.brought == 4)
+                if(player.pr2.bought == 4)
                 {
                     player.unlocking.push("kuaraniai");
                 }
-                if(player.pr2.brought == 5)
+                if(player.pr2.bought == 5)
                 {
                     player.ug1.xScaleStart *= 3
                     player.ug1.xScaleStrength /= 3
@@ -123,27 +103,27 @@ function prestige(type)
         player.speed = new Decimal(1);
         ug1.changeText([{text: "Upgrade\nSpeed"}])
         player.ug1.cost = new Decimal(5)
-        player.ug1.brought = 0
+        player.ug1.bought = 0
         player.ug1.reduction = new Decimal(1)
 
         ug2.changeText([{text: "Decrease\nSpeed Cost"}])
         player.ug2.cost = new Decimal(100000)
-        player.ug2.brought = 0
+        player.ug2.bought = 0
     }
 }
 
 function updatePr2Element()
 {
-    var desc = "Reset ALL Your progress, But gain muti to PR1"
+    var desc = "Reset your current progress to gain a multiplier to PRai."
     var size = 18
                 
-    if(player.pr2.brought == 1)
+    if(player.pr2.bought == 1)
     {
-        desc = "Reset ALL Your progress, But gain muti to PR1 and a Speed autobuyer."
+        desc = "Reset your current progress to gain a multiplier to PRai and a speed autobuyer."
     }
-    else if(player.pr2.brought == 4)
+    else if(player.pr2.bought == 4)
     {
-        desc = "Reset ALL Your previous Progress, But gain multi to PRai and Cost reduction softcaps 3x later and 3x weaker."
+        desc = "Reset your current progress to gain a multiplier to PRai, and make the cost reduction softcap 30% weaker and start 3x later."
         size = 14
     } 
     
@@ -170,11 +150,11 @@ function calcPRaiBoost()
 //this calculates the PRai you will get when you PR1
 function calcPRaiGain()
 {
-    if(player.pr2.brought == 0) return new Decimal(1)
+    if(player.pr2.bought == 0) return new Decimal(1)
     else 
     {
         var out = Decimal.root(player.number.divide(1e6),4);
-        if((player.pr2.brought >= 2)) out = out.multiply(new Decimal(player.pr2.brought).pow(1.25));
+        if((player.pr2.bought >= 2)) out = out.multiply(new Decimal(player.pr2.bought).pow(1.25));
         
         return out;
     }

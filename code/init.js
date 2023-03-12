@@ -39,6 +39,8 @@ function setPlayerVaribles()
             autobuyer: false,
             xScaleStart: 15,
             xScaleStrength: 1,
+            SuperScaleStart: 40,
+            SuperScaleStrength: 3,
         },
         pr2:
         {
@@ -52,6 +54,8 @@ function setPlayerVaribles()
             autobuyer: false,
             xScaleStart: 15,
             xScaleStrength: 1,
+            SuperScaleStart: 40,
+            SuperScaleStrength: 3,
             softcapStart: 10,
             softcapStrength: 1,
         },
