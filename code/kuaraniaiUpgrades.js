@@ -96,8 +96,8 @@ var kuaraniaiShardUpgrades =
                 kuaraniaiShardUpgradeButtons.showNext()
                 player.kuaraniaiShardUpgrade++;
                 
-                player.kuaraniaiGainSoftcaps.normalStart = player.kuaraniaiGainSoftcaps.normalStart.add(2)
-                player.kuaraniaiGainSoftcaps.normalStrength /= 1.25
+                //player.kuaraniaiGainSoftcaps.normalStart = player.kuaraniaiGainSoftcaps.normalStart.add(2)
+                //player.kuaraniaiGainSoftcaps.normalStrength /= 1.25
             } 
         }  
     },

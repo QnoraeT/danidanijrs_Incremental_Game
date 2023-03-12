@@ -103,11 +103,11 @@ function updatePr2Element()
     var desc = "Reset your current progress to gain a multiplier to PRai."
     var size = 18
                 
-    if(player.pr2.bought.equ(1))
+    if(player.pr2.bought.equals(1))
     {
         desc = "Reset your current progress to gain a multiplier to PRai and a speed autobuyer."
     }
-    else if(player.pr2.bought.equ(4))
+    else if(player.pr2.bought.equals(4))
     {
         desc = "Reset your current progress to gain a multiplier to PRai, and make the cost reduction softcap 30% weaker and start 3x later."
         size = 14

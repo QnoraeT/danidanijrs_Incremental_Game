@@ -11,7 +11,7 @@ function dev()
     unlock("ug2")
     unlock("ug1autobuyer")
     unlock("kuaraniai")
-    player.pr2.bought = 3
+    player.pr2.bought = new Decimal (3)
     player.prai = new Decimal(500)
     player.kuaraniai = new Decimal(1e6)
 }
@@ -207,6 +207,7 @@ function setup()
     
     tab = "generators"
     app.ticker.add(delta => gameLoop(delta));
+    dev()
 }
 
 var reccentFPS = []
@@ -240,7 +241,7 @@ function generators(delta)
     else ug1Info.text = "\nUpgrade Speed, Need " + format(player.ug1.cost) + "\nYou bought this " + player.ug1.bought + " times";
        
     praiDisplay.text = "You have " + format(player.prai) + " PRai which boosts your generation by x" + format(calcPRaiBoost(),player.kuaraniaiShardUpgrade >= 2);
-    if(player.number.lessThan(1e6) || ((player.number.greaterThanOrEqualTo(1e6)) && player.pr2.bought == 0))
+    if(player.number.lessThan(1e6) || ((player.number.greaterThanOrEqualTo(1e6)) && player.pr2.bought.equals(0)))
     {
         praiTime.text = "It would take " + formatTime(new Decimal(1e6).minus(player.number).divide(player.speed.times(calcPRaiBoost()))) + " to get to " + format(new Decimal(1e6));
     }
