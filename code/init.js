@@ -1,6 +1,5 @@
 //alise
-let Resources = PIXI.Loader.shared.resources
-let Loader = PIXI.Loader.shared
+//let Loader = PIXI.Loader.Assets
 let TextureCache = PIXI.utils.TextureCache
 let Sprite = PIXI.Sprite
 let Container = PIXI.Container
@@ -90,7 +89,6 @@ var player = setPlayerVaribles()
 let app = new PIXI.Application({width: 960, height: 720});
 document.body.appendChild(app.view);
 var tab = null;
-
 
 
 
