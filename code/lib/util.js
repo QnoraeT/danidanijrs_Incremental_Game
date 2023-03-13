@@ -142,7 +142,7 @@ function keyboard(value)
   return key;
 }
 
-function sansSerifStyle(size = 36,colour = "white",wrap = -1)
+function sansSerifStyle(size = 36, colour = "white", wrap = -1)
 {
     let out = 
     {
@@ -158,7 +158,7 @@ function sansSerifStyle(size = 36,colour = "white",wrap = -1)
     return new PIXI.TextStyle(out)
 }
 
-function danidanijrStyle(size = 36,colour = "white",wrap = -1)
+function danidanijrStyle(size = 36, colour = "white", wrap = -1)
 {
     let out = 
     {
