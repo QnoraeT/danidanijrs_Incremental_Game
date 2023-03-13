@@ -113,7 +113,13 @@ function updatePr2Element()
         size = 14
     } 
     
-    pr2.changeText([{text: "Requires: " + format(calcPr2CostEffects(),player.kuaraniaiShardUpgrade >= 2) + " PRai"},{text: desc,style: sansSerifStyle(size,"black",300)}])
+    pr2.changeText([{
+        text: "Requires: " + format(calcPr2CostEffects(),player.kuaraniaiShardUpgrade >= 2) + " PRai"
+    },
+    {
+        text: desc,
+        style: sansSerifStyle(size, "black", 300)
+    }])
 }
 
 function switchTab(t)

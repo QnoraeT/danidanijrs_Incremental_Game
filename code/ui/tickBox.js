@@ -1,3 +1,69 @@
+class TickBox extends PIXI.Container 
+{
+    constructor(writing, effect, state) 
+    {
+      super();
+      
+      this.writing = writing;
+      
+      let png = state ? "images/on.png" : "images/off.png";
+      const texture = PIXI.Assets.get(png);
+      this.box = new PIXI.Sprite(texture);
+      this.box.effect = effect;
+      this.box.bstate = state;
+  
+      this.addChild(this.box);
+      
+      this.text = new PIXI.Text(writing, sansSerifStyle(24));
+      this.text.position.set(26, 0);
+      this.addChild(this.text);
+      
+      this.box.interactive = true;
+      var filter = new PIXI.filters.ColorMatrixFilter();
+      this.box.filters = [filter];
+      
+      this.box.on("pointerover", () => {
+          filter.brightness(1.3, false);
+      });
+      this.box.on("pointerout", () => {
+          filter.brightness(1, false);
+      });
+      
+      this.box.on("mousedown", () => {
+          filter.brightness(0.8, false);
+      });
+                      
+      this.box.on("mouseup", () => 
+      {
+          filter.brightness(1, false);
+          this.box.bstate = !this.box.bstate;
+          if(this.box.bstate) 
+            this.box.texture = PIXI.utils.TextureCache["images/on.png"];
+          else 
+            this.box.texture = PIXI.utils.TextureCache["images/off.png"];
+          
+          this.box.effect();
+      });
+    }
+    
+    getState() 
+    {
+      return this.box.bstate;
+    }
+    
+    setState(state) 
+    {
+      this.box.bstate = state;
+      if(state) this.box.texture = PIXI.utils.TextureCache["images/on.png"];
+      else this.box.texture = PIXI.utils.TextureCache["images/off.png"];
+    }
+    
+    changeText(writing) 
+    {
+      this.text.text = writing;
+    }
+}
+/*
 function TickBox(writing,effect,state)
 {
     PIXI.Container.call(this);
@@ -65,7 +131,7 @@ TickBox.prototype.changeText = function(writing)
 {
     this.text.text = writing;
 }
-
+*/
 
 
 

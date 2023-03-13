@@ -1,7 +1,12 @@
 //the codes layout and a little bit of the actual code is from kittykatattacks learning pixi.js tutorial i also used pixi.js and collections.js
 
 
-Loader.add(["images/on.png","images/off.png"]).load(setup);
+const textures = PIXI.Assets.load(["images/on.png","images/off.png"])
+    .then(function()
+    {
+        console.log("Textures Loaded");
+        setup();
+    });
 
 function dev()
 {
@@ -237,6 +242,7 @@ function gameLoop(delta)
 
 function generators(delta)
 {
+    
     if(player.unlocked.has("ug2")) ug1Info.text = "Cost reduction:" + format(player.ug1.reduction) + "\nUpgrade Speed, Need " + format(player.ug1.cost) + "\nYou bought this " + player.ug1.bought + " times";
     else ug1Info.text = "\nUpgrade Speed, Need " + format(player.ug1.cost) + "\nYou bought this " + player.ug1.bought + " times";
        
@@ -250,9 +256,11 @@ function generators(delta)
     ug1.update(player.number.greaterThanOrEqualTo(player.ug1.cost));
     pr1.update(player.number.greaterThanOrEqualTo(1e6));
     pr2.update(player.prai.greaterThanOrEqualTo(player.pr2.cost));
-    if(player.unlocked.has("pr2")) updatePr2Element();
-    ug2.update(player.number.greaterThanOrEqualTo(player.ug2.cost));
     
+    if(player.unlocked.has("pr2")) 
+        updatePr2Element();
+    ug2.update(player.number.greaterThanOrEqualTo(player.ug2.cost));
+
     ug2Info.text = "Reduce cost: " + format(player.ug2.cost) + "\nYou bought this " + player.ug2.bought + " times"
     if(player.unlocked.has("ug2") && player.ug2.bought.gte(player.ug2.softcapStart)) softcapText.visible = true
     else softcapText.visible = false
@@ -302,6 +310,7 @@ function stats(delta)
 
 function kuaraniai(delta)
 {
+    
     kuaraniaiDisplay.text = "Kuaraniai: " + format(player.kuaraniai)
     
     kuaraniaiShardsDisplay.text = "Kuaraniai Shards: " + format(player.kuaraniaiShards,true)
@@ -327,6 +336,7 @@ function kuaraniai(delta)
         praiSacrificeInfo.text = "You'll gain " + format(calcKuaraniaiGain()) + " Kuaraniai\nbut to a PR2 reset.";
         praiSacrificeButton.visible = true
     }
+    
 }
 
 
