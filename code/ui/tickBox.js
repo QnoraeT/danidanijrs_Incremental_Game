@@ -161,5 +161,3 @@ TickBox.prototype.changeText = function(writing)
 
 
 
-
-
