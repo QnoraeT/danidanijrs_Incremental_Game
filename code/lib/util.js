@@ -176,67 +176,80 @@ function danidanijrStyle(size = 36, colour = "white", wrap = -1)
     return new PIXI.TextStyle(out)
 }
 
-function format(x,fixed = false)
+function format(x, fixed = false)
 {
-	//var abb = ["","K","M","B","T","q","Q","s","S","O","N","d","U","D"]
 	var lay = x.layer
 	var mag = x.mag
-	if(x.equals(0)) return "0";
-    if(x.lessThan(0)) return "-" + format(x.abs(),fixed);
-	else if(x.lessThan(10))
+	if (x.equals(0)) 
+    return "0";
+  if (x.lessThan(0)) 
+    return "-" + format(x.abs(),fixed);
+	if (x.lessThan(10))
 	{
-		//var dp = Math.pow(10,((Math.floor(Math.log10(mag)) - 2) * -1))
-        if(fixed) return mag.toFixed(3)
-		else return (Math.floor((mag * 1000)) / 1000) + "";
+    if(fixed) 
+      return mag.toFixed(3)
+    //using Number.parseFloat removes redundent "0"s in the decimal part of the nummber
+		return Number.parseFloat(mag.toFixed(3)) + "";
 	}
-    else if(x.lessThan(1000))
+  if (x.lessThan(1000))
 	{
-        if(fixed) return mag.toFixed(2)
-		else return (Math.floor((mag * 100)) / 100) + "";
-    }
-    else if(x.lessThan(1000000))
-	{
-        return Math.floor(mag)
-    }
-    else
-    {
-        if(lay == 0) mag = Math.log10(mag)
-        var m = Math.round(Math.pow(10,mag % 1) * 1e5) / 1e5
+    if (fixed) 
+      return mag.toFixed(2)
+		return Number.parseFloat(mag.toFixed(2)) + "";
+  }
+  if (x.lessThan(1000000))
+    return Math.floor(mag)
+  else
+  {
+    if(lay == 0) 
+      mag = Math.log10(mag)
+    var mantissa = Math.pow(10, mag % 1)
         
-        if(fixed) return m.toFixed(2) + "e" + Math.floor(mag)
-        else return (Math.floor(m * 100) / 100) + "e" + Math.floor(mag)
-    }
-	/*else if(x.lessThan(new Decimal("1e" + (abb.length * 3))))
+    if (fixed) 
+      return mantissa.toFixed(2) + "e" + Math.floor(mag)
+    return Number.parseFloat(mantissa.toFixed(2)) + "e" + Math.floor(mag);
+  }
+  /*
+  var abb = ["","K","M","B","T","q","Q","s","S","O","N","d","U","D"]
+	if (x.lessThan(new Decimal("1e" + (abb.length * 3))))
 	{
-		if(mag <= (abb.length * 3))
-		{
-			mag = Math.pow(10,mag)
-			lay--;
-		}
-		var factor = Math.pow(10,Math.floor(Math.log10(mag) / 3) * 3);
-		var dp = Math.pow(10,((Math.floor(Math.log10(x / factor)) - 2) * -1))
-		return Math.floor((x / factor) * dp) / dp + abb[Math.log10(factor) / 3];
-	}*/
+    let powerOf1000 = Decimal.floor(x.log(1000));
+		let mantissa = x.divide(Decimal.pow(1000, powerOf1000))
+    if (mantissa.round() >= 1000)
+      mantissa = 999;
+
+    if (fixed)
+      return mantissa.toPrecision(3) +  abb[powerOf1000];
+		return  Number.parseFloat(mantissa.toPrecision(3)) + abb[powerOf1000];
+	}
+  */
 }
 
 function formatTime(x)
 {
-    if(x < 0) return "0s"
+    if(x < 0) 
+      return "0s"
+
     var out = (Math.floor(x) % 60) + "s"
-    if(x >= 60) out = (Math.floor(x / 60) % 60) + "m " + out
-    if(x >= 3600) out = (Math.floor(x / 3600) % 24) + "h " + out
-    if(x >= 86400) out = Math.floor(x / 86400) + "d " + out
+    if(x >= 60) 
+      out = (Math.floor(x / 60) % 60) + "m " + out
+    if(x >= 3600)
+       out = (Math.floor(x / 3600) % 24) + "h " + out
+    if(x >= 86400) 
+      out = Math.floor(x / 86400) + "d " + out
     return out
 }
 
 function getRainbowColour(offset = 0)
 {
     let time = new Date().getTime();
-    let r = Math.sin(0.001 * time + offset) * 60 + 180;
-    let g = Math.sin(0.001 * time + (Math.PI * 2 / 3) + offset) * 60 + 180;
-    let b = Math.sin(0.001 * time + (Math.PI * 4 / 3) + offset) * 60 + 180;
+    let red = Math.sin(0.001 * time + offset) * 60 + 180;
+    let green = Math.sin(0.001 * time + (Math.PI * 2 / 3) + offset) * 60 + 180;
+    let blue = Math.sin(0.001 * time + (Math.PI * 4 / 3) + offset) * 60 + 180;
     
-    return "#" + pad(Math.round(r).toString(16),2) + pad(Math.round(g).toString(16),2) + pad(Math.round(b).toString(16),2)
+    return "#" + pad(Math.round(red).toString(16), 2) 
+               + pad(Math.round(green).toString(16), 2) 
+               + pad(Math.round(blue).toString(16), 2)
 }
 
 function pad(num,length)
