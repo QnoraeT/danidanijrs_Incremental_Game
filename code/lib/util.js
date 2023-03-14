@@ -165,6 +165,8 @@ function danidanijrStyle(size = 36, colour = "white", wrap = -1)
         fontFamily: "Danidanijrs Font,sans-serif",
         fontSize: size,
         fill: colour,
+        trim: false,
+        padding: 10,
     }
     if(wrap >= 0)
     {
