@@ -25,7 +25,7 @@ function setup()
 {   
     //header
     pointsDisplay = new PIXI.Text("0.000",danidanijrStyle())
-     pointsDisplay.position.set(0, 5)
+    pointsDisplay.position.set(0, 5)
     app.stage.addChild(pointsDisplay);
     
     fpsDisplay = new PIXI.Text("0 FPS",danidanijrStyle(36,"yellow"))
