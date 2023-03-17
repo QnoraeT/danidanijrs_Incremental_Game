@@ -102,7 +102,7 @@ var kuaraniaiShardUpgrades =
         }  
     },
     { //#7
-        desc: "Synergized Kuaraniai Power gen from Achievement 8's boost uses a better formula. log5.6 -> ^0.25 + log5.6",
+        desc: "Synergized Kuaraniai Power gen from Achievement 8's boost uses a better formula. log5.6(x) -> x^0.25",
         cost: new Decimal(1e6),
         colour: 0x9102EA,
         borderColour: 0x0509FF,

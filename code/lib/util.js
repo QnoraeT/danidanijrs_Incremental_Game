@@ -149,6 +149,8 @@ function sansSerifStyle(size = 36, colour = "white", wrap = -1)
         fontFamily: "sans-serif",
         fontSize: size,
         fill: colour,
+        trim: false,
+        padding: 10,
     }
     if(wrap >= 0)
     {
@@ -174,47 +176,52 @@ function danidanijrStyle(size = 36, colour = "white", wrap = -1)
     return new PIXI.TextStyle(out)
 }
 
-function format(x,fixed = false)
+function format(x, fixed = false)
 {
-	//var abb = ["","K","M","B","T","q","Q","s","S","O","N","d","U","D"]
-	var lay = x.layer
-	var mag = x.mag
-	if(x.equals(0)) return "0";
-    if(x.lessThan(0)) return "-" + format(x.abs(),fixed);
-	else if(x.lessThan(10))
-	{
-		//var dp = Math.pow(10,((Math.floor(Math.log10(mag)) - 2) * -1))
-        if(fixed) return mag.toFixed(3)
-		else return (Math.floor((mag * 1000)) / 1000) + "";
-	}
-    else if(x.lessThan(1000))
-	{
-        if(fixed) return mag.toFixed(2)
-		else return (Math.floor((mag * 100)) / 100) + "";
+    var lay = x.layer
+    var mag = x.mag
+    if (x.equals(0)) 
+        return "0";
+    if (x.lessThan(0)) 
+        return "-" + format(x.abs(),fixed);
+    if (x.lessThan(10))
+    {
+        if(fixed) 
+            return mag.toFixed(3)
+        //using Number.parseFloat removes redundent "0"s in the decimal part of the nummber
+            return Number.parseFloat(mag.toFixed(3)) + "";
     }
-    else if(x.lessThan(1000000))
-	{
+    if (x.lessThan(1000))
+    {
+        if (fixed) 
+            return mag.toFixed(2)
+        return Number.parseFloat(mag.toFixed(2)) + "";
+    }
+    if (x.lessThan(1000000))
         return Math.floor(mag)
-    }
     else
     {
-        if(lay == 0) mag = Math.log10(mag)
-        var m = Math.round(Math.pow(10,mag % 1) * 1e5) / 1e5
+        if(lay == 0) 
+            mag = Math.log10(mag)
+        var mantissa = Math.pow(10, mag % 1)
         
-        if(fixed) return m.toFixed(2) + "e" + Math.floor(mag)
-        else return (Math.floor(m * 100) / 100) + "e" + Math.floor(mag)
+        if (fixed) 
+            return mantissa.toFixed(2) + "e" + Math.floor(mag)
+        return Number.parseFloat(mantissa.toFixed(2)) + "e" + Math.floor(mag);
     }
-	/*else if(x.lessThan(new Decimal("1e" + (abb.length * 3))))
-	{
-		if(mag <= (abb.length * 3))
-		{
-			mag = Math.pow(10,mag)
-			lay--;
-		}
-		var factor = Math.pow(10,Math.floor(Math.log10(mag) / 3) * 3);
-		var dp = Math.pow(10,((Math.floor(Math.log10(x / factor)) - 2) * -1))
-		return Math.floor((x / factor) * dp) / dp + abb[Math.log10(factor) / 3];
-	}*/
+  /*
+    var abb = ["","K","M","B","T","q","Q","s","S","O","N","d","U","D"]
+    if (x.lessThan(new Decimal("1e" + (abb.length * 3))))
+    {
+        let powerOf1000 = Decimal.floor(x.log(1000));
+        let mantissa = x.divide(Decimal.pow(1000, powerOf1000))
+        if (mantissa.round() >= 1000)
+            mantissa = 999;
+        if (fixed)
+            return mantissa.toPrecision(3) +  abb[powerOf1000];
+        return  Number.parseFloat(mantissa.toPrecision(3)) + abb[powerOf1000];
+    }
+  */
 }
 
 function formatTime(x)

@@ -1,7 +1,7 @@
 //the codes layout and a little bit of the actual code is from kittykatattacks learning pixi.js tutorial i also used pixi.js and collections.js
 
 
-const textures = PIXI.Assets.load(["images/on.png","images/off.png"])
+const textures = PIXI.Assets.load(["images/on.png","images/off.png","danidanijrs-font.ttf"])
     .then(function()
     {
         console.log("Textures Loaded");
@@ -25,15 +25,16 @@ function setup()
 {   
     //header
     pointsDisplay = new PIXI.Text("0.000",danidanijrStyle())
+     pointsDisplay.position.set(0, 5)
     app.stage.addChild(pointsDisplay);
     
     fpsDisplay = new PIXI.Text("0 FPS",danidanijrStyle(36,"yellow"))
-    fpsDisplay.position.set(480,0)
+    fpsDisplay.position.set(480,5)
     fpsDisplay.anchor.set(0.5,0)
     app.stage.addChild(fpsDisplay);
     
     speedDisplay = new PIXI.Text("Speed: 1",danidanijrStyle())
-    speedDisplay.position.set(960,0)
+    speedDisplay.position.set(960,5)
     speedDisplay.anchor.set(1,0)
     app.stage.addChild(speedDisplay);
     
@@ -114,13 +115,11 @@ function setup()
     
     pr2 = new UpgradeButton([{text: "Requires: 10 PRai"},{text: "Reset ALL Your progress, But gain a new upgrade and a PR1 Muti that scales with your PTS.",style: sansSerifStyle(18,"black",300)}],function(){prestige("pr2")},0xBBBBBB)
     pr2.position.set(602,500);
-    //pr2.anchor.set(1,0); anchor wont work for some reason
     pr2.visible = false;
     generatorsTab.addChild(pr2)
     
     ug2 = new UpgradeButton([{text: "Decrease\nSpeed Cost"}],function(){buyUg2()},0xBBBBBB)
     ug2.position.set(602,375);
-    //ug2.pivot.set(ug2.width,0)
     ug2.visible = false
     generatorsTab.addChild(ug2);
     
