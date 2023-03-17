@@ -205,23 +205,3 @@ UpgradeButton.prototype.changeText = function(writing)
 }
 */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -333,7 +333,3 @@ function hardReset()
     return false;
 }
 
-
-
-
-
