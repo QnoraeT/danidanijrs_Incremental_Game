@@ -211,6 +211,7 @@ function setup()
     
     tab = "generators"
     app.ticker.add(delta => gameLoop(delta));
+    dev()
 }
 
 var reccentFPS = []
@@ -336,6 +337,7 @@ function kuaraniai(delta)
     }
     
 }
+
 
 
 
