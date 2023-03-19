@@ -169,7 +169,7 @@ function setup()
     app.stage.addChild(optionsTab)
     
     fullResetButton = new Button("FULL RESET",function() {hardReset()},0xED1515,0xC10303);
-    fullResetButton.position.set(480 - (fullResetButton.width / 2),650);
+    fullResetButton.position.set(480 - (fullResetButton.width / 2), 580);
     //fullResetButton.anchor.set(0.5,0);
     optionsTab.addChild(fullResetButton);
     
@@ -189,7 +189,7 @@ function setup()
     app.stage.addChild(kuaraniaiTab)
     
     kuaraniaiShardUpgradeButtons = new KuaraniaiUpgradeSection(kuaraniaiShardUpgrades,"KShards")
-    kuaraniaiShardUpgradeButtons.position.set(6,250)
+    kuaraniaiShardUpgradeButtons.position.set(6,220)
     kuaraniaiTab.addChild(kuaraniaiShardUpgradeButtons)
     
     kuaraniaiShardsDisplay = new PIXI.Text("Kuaraniai Shards: 0",danidanijrStyle(36,"#EC97EF"))
@@ -202,7 +202,7 @@ function setup()
     kuaraniaiTab.addChild(kuaraniaiShardsProdDisplay);
     
     kuaraniaiPowerUpgradeButtons = new KuaraniaiUpgradeSection(kuaraniaiPowerUpgrades,"KPower")
-    kuaraniaiPowerUpgradeButtons.position.set(6,500)
+    kuaraniaiPowerUpgradeButtons.position.set(6,470)
     kuaraniaiTab.addChild(kuaraniaiPowerUpgradeButtons)
     
     kuaraniaiPowerDisplay = new PIXI.Text("Kuaraniai Power: 0",danidanijrStyle(36,"#EC97EF"))
