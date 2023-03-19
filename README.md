@@ -2,9 +2,11 @@
 
 play at https://qnoraet.github.io/danidanijrs_Incremental_Game/index.html
 
-TODO
-1.add the other font
-2.add the animation things and change the text display colour
-3.make the upgrades buyable and add functionallity
+things i want to do:
+
+make the border not ugly or at least be able to rescale the game based off of resolution
+generalize KuaUPGs
+make Pre-PR2 era not bad
+
 
 
